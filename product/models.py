@@ -14,7 +14,7 @@ class Product(models.Model):
         profit=self.sell_price-self.buy_price
         return profit
     def profit_recent(self):
-        profit_recent=(self.profit()//self.buy_price)*100
+        profit_recent=(self.profit()/self.buy_price)*100
         return profit_recent
     def __str__(self):
         return self.name
