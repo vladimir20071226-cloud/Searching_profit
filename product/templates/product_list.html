@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <table>
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Статус</th>
+                <th>Цена покупки</th>
+                <th>Цена продажи</th>
+                <th>Прибыль</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for product in products %}
+            <tr>
+                <td>{{ product.name }}</td>
+                <td>{{ product.status }}</td>
+                <td>{{ product.buy_price }}</td>
+                <td>{{ product.sell_price }}</td>
+                <td>{{ product.profit }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
