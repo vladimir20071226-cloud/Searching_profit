@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container mt-5">
-    <table>
+    <table class="table table-stripped table-bordered">
         <thead>
             <tr>
                 <th>Название</th>
@@ -15,7 +15,7 @@
         {% for product in products %}
             <tr>
                 <td>{{ product.name }}</td>
-                <td>{{ product.status }}</td>
+                <td>{{ product.get_status_display }}</td>
                 <td>{{ product.buy_price }}</td>
                 <td>{{ product.sell_price }}</td>
                 <td>{{ product.profit }}</td>
