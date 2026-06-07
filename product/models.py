@@ -37,9 +37,12 @@ class Product(models.Model):
     def profit(self):
         profit=self.sell_price-self.buy_price
         return profit
-    @property
+   @property
     def profit_recent(self):
-        profit_recent=(self.profit/self.buy_price)*100
-        return profit_recent
+        try:
+            profit_recent=(self.profit/self.buy_price)*100
+            return profit_recent
+        except ZeroDivisionError:
+            raise ValueError("Цена покупки не должна быть 0")
     def __str__(self):
         return self.name
