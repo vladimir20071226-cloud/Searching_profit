@@ -19,5 +19,12 @@ import product.views as views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.main, name='main'),
-    path('products/all/', views.product_list, name='product_list')
+    path('products/all/', views.product_list, name='product_list'),
+    path('products/add/', views.add_product, name="add_product"),
+    path('products/sort/', views.sort_status, name="sort_status"),
+    path('login/', views.login_user, name='login'),
+    path('register/', views.register, name='register'),
+    path('logout/', views.user_logout, name='user_logout'),
+    path('login_success/', views.login_success, name='login_success'),
+    path('verify-email/', views.verify_email, name="verify_email")
 ]

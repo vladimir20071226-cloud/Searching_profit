@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Добавить товар</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div>
+            <label>Название</label>
+            <input type="text" name="name" required>
+        </div>
+        <div>
+            <label>Цена покупки:</label>
+            <input type="number" step="0.01" name="buy_price" required>
+        </div>
+        <div>
+            <label>Цена продажи:</label>
+            <input type="number" step="0.01" name="sell_price" required>
+        </div>
+        <button type="submit">Сохранить</button>
+    </form>
+</div>
+{% endblock %}
