@@ -28,7 +28,12 @@ class Product(models.Model):
         self._discount_value=value
     @property
     def status(self):
-        return 'doubtful'
+        if self.profit_recent >= 10:
+            return "profitable"
+        elif 0 < self.profit_recent < 10:
+            return "doubtful"
+        else:
+            return "unprofitable"
     @property
     def final_price(self):
         final_price=self.price*(1-self._discount_value/100)
@@ -37,7 +42,7 @@ class Product(models.Model):
     def profit(self):
         profit=self.sell_price-self.buy_price
         return profit
-   @property
+    @property
     def profit_recent(self):
         try:
             profit_recent=(self.profit/self.buy_price)*100

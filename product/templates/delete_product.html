@@ -1,10 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
   <h2>Список товаров</h2>
-  <a href="{% url 'add_product' %}" class="btn btn-success mb-3">
-    Новый товар
-  </a>
-
   <table class="table">
     <thead>
       <tr>
@@ -21,24 +17,19 @@
         <td>{{ product.buy_price }}</td>
         <td>{{ product.sell_price }}</td>
         <td>
+          <button class="btn btn-danger btn-sm delete-btn" data-code="{{ product.id }}">
+            Удалить
+          </button>
           <a href="{% url 'edit_product' product.id %}" class="btn btn-primary btn-sm">
             Редактировать
           </a>
-          <form method="post" action="{% url 'product_delete' product.id %}" style="display:inline;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger btn-sm">
-              Удалить
-            </button>
-          </form>
         </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
-
-  {% if request.GET.deleted == 'true' %}
-    <div class="alert alert-success">Товар удален</div>
-  {% elif request.GET.deleted == 'false' %}
-    <div class="alert alert-danger">Ошибка удаления</div>
-  {% endif %}
-{% endblock %}
+    {% if request.GET.deleted == 'true' %}
+        <div class="alert alert-success">Товар удален</div>
+    {% elif request.GET.deleted == 'false' %}
+        <div class="alert alert-danger">Ошибка</div>
+    {% endif %}

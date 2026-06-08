@@ -1,23 +1,16 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate
 from .decorators import verified_required
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import login, logout
+from django.views import View
 from .models import Product
 def main(request):
     return render(request, 'index.html')
 #@verified_required
 def product_list(request):
     products=Product.objects.all()
-    for product in products:
-        if product.profit_recent>=10:
-            product.status="profitable"
-        elif 0<product.profit_recent<10:
-            product.status="doubtful"
-        else:
-            product.status="unprofitable"
-        product.save()
     return render(request, 'product_list.html', {"products": products})
 def login_user(request):
     if request.method=='POST':
@@ -43,7 +36,20 @@ def register(request):
     return render(request, "register.html")
 def login_success(request):
     return render(request, "login_success.html")
-
+def product_delete(request, pk):
+    if request.method=='POST':
+        product=get_object_or_404(Product, pk=pk)
+        product.delete()
+        return redirect('/delete_product/?deleted=True')
+    return redirect('/delete_product/?deleted=False')
+def edit_product(request, product_id, **kwargs):
+    products=Product.objects.all()
+    for p in products:
+        if p.id==product_id:
+            for key, value in kwargs.items():
+                setattr(p, key, value)
+            p.save()
+    return redirect('product_list')
 def user_logout(request):
     logout(request)
     return redirect("index")
