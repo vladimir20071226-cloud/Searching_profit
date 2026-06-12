@@ -8,7 +8,6 @@ class Product(models.Model):
     source_sell=models.URLField(max_length=200)
     source_buy=models.URLField(max_length=200)
     created_at=models.DateTimeField(auto_now_add=True)
-    discount_value=models.IntegerField(default=0)
     stock=models.PositiveIntegerField(default=0)
     @property
     def price(self):

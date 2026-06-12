@@ -6,6 +6,8 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.views import View
 from .models import Product
+from .forms import ProductForm
+from django.http import JsonResponse
 def main(request):
     return render(request, 'index.html')
 #@verified_required
@@ -40,16 +42,35 @@ def product_delete(request, pk):
     if request.method=='POST':
         product=get_object_or_404(Product, pk=pk)
         product.delete()
-        return redirect('/delete_product/?deleted=True')
-    return redirect('/delete_product/?deleted=False')
-def edit_product(request, product_id, **kwargs):
+        return JsonResponse({"success": True, "id": pk})
+    return redirect("product_list")
+def edit_product(request, pk):
+    product=get_object_or_404(Product, pk=pk)
+    if request.method=='POST':
+        form=ProductForm(request.POST, instance=product)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({
+                "success": True,
+                "id": pk,
+                "name": product.name,
+                "sell_price": product.name,
+                "buy_price": product.buy_price
+            })
+        return redirect ("product_list")
+    else:
+        form=ProductForm(instance=product)
+    return render(request, "edit_product.html", {"form": form, "product": product})
+def search_product(request):
+    query=request.GET.get('q')
+    status=request.GET.get('status')
     products=Product.objects.all()
-    for p in products:
-        if p.id==product_id:
-            for key, value in kwargs.items():
-                setattr(p, key, value)
-            p.save()
-    return redirect('product_list')
+    if query:
+        products=products.filter(__icontains=query)
+    if status:
+        products=[p for p in products if p.status==status]
+    context={"request": request, "products": products}
+    return redirect(request, "product_list.html", context)
 def user_logout(request):
     logout(request)
     return redirect("index")
@@ -62,13 +83,10 @@ def verify_email(request):
 #@verified_required
 def add_product(request):
     if request.method=='POST':
-        name=request.POST.get("name")
-        buy_price=request.POST.get("buy_price")
-        sell_price=request.POST.get("sell_price")
-        product=Product.objects.create(name=name,
-                               buy_price=buy_price,
-                               sell_price=sell_price)
-        return redirect("product_list")
+        form=ProductForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("product_list")
     return render(request, 'add_product.html')
 #@verified_required
 def sort_status(request):

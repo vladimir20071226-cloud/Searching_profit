@@ -4,7 +4,17 @@
   <a href="{% url 'add_product' %}" class="btn btn-success mb-3">
     Новый товар
   </a>
+<form method="get" action="{% url 'search_product' %}" class="mb-3 d-flex gap-2">
+    <input type="text" name="q" class="form-control" placeholder="Поиск по названию..." value="{{ request.GET.q }}">
 
+    <select name="status" class="form-select">
+        <option value="">Все статусы</option>
+        <option value="doubtful" {% if request.GET.status == "doubtful" %}selected{% endif %}>Сомнительный</option>
+        <option value="profitable" {% if request.GET.status == "profitable" %}selected{% endif %}>Выгодный</option>
+        <option value="unprofitable" {% if request.GET.status == "unprofitable" %}selected{% endif %}>Невыгодный</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Фильтровать</button>
+</form>
   <table class="table">
     <thead>
       <tr>
@@ -16,7 +26,17 @@
     </thead>
     <tbody>
       {% for product in products %}
-      <tr id="row-{{ product.id }}">
+      <tr id="row-{{ product.id }}"
+        {% if product.status == "unprofitable" %}
+          class="table-danger"
+        {% endif %}
+        {% if product.status == "profitable" %}
+          class="table-success"
+        {% endif %}
+        {% if product.status == "doubtful" %}
+          class="table-warning"
+        {% endif %}
+      >
         <td>{{ product.name }}</td>
         <td>{{ product.buy_price }}</td>
         <td>{{ product.sell_price }}</td>
@@ -36,9 +56,64 @@
     </tbody>
   </table>
 
-  {% if request.GET.deleted == 'true' %}
+  {% if request.GET.deleted == 'True' %}
     <div class="alert alert-success">Товар удален</div>
-  {% elif request.GET.deleted == 'false' %}
+  {% elif request.GET.deleted == 'False' %}
     <div class="alert alert-danger">Ошибка удаления</div>
   {% endif %}
 {% endblock %}
+<script>
+// Удаление товара
+document.querySelectorAll(".delete-btn").forEach(btn => {
+  btn.addEventListener("click", function() {
+    const id = this.dataset.id;
+    fetch(`/products/delete/${id}/`, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}"
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById(`row-${id}`).remove();
+      }
+    });
+  });
+});
+
+// Редактирование товара (пример без модалки, просто обновление)
+document.querySelectorAll(".edit-btn").forEach(btn => {
+  btn.addEventListener("click", function() {
+    const id = this.dataset.id;
+    const newName = prompt("Новое название:", this.dataset.name);
+    const newBuy = prompt("Новая закупочная цена:", this.dataset.buy);
+    const newSell = prompt("Новая продажная цена:", this.dataset.sell);
+
+    if (newName && newBuy && newSell) {
+      const formData = new URLSearchParams();
+      formData.append("name", newName);
+      formData.append("buy_price", newBuy);
+      formData.append("sell_price", newSell);
+
+      fetch(`/products/edit/${id}/`, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": "{{ csrf_token }}",
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: formData.toString()
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const row = document.getElementById(`row-${id}`);
+          row.children[0].textContent = data.name;
+          row.children[1].textContent = data.buy_price;
+          row.children[2].textContent = data.sell_price;
+        }
+      });
+    }
+  });
+});
+</script>
