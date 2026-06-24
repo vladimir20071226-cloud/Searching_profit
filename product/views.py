@@ -85,7 +85,9 @@ def add_product(request):
         if form.is_valid():
             form.save()
             return redirect("product_list")
-    return render(request, 'add_product.html')
+    else:
+        form=ProductForm()
+    return render(request, 'add_product.html', {"form": form})
 #@verified_required
 def sort_status(request):
     selected_status=request.POST.get("status", "profitable")
