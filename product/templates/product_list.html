@@ -4,7 +4,6 @@
   <a href="{% url 'add_product' %}" class="btn btn-success mb-3">
     Новый товар
   </a>
-<form method="get" action="{% url 'search_product' %}" class="mb-3 d-flex gap-2">
     <input type="text" name="q" class="form-control" placeholder="Поиск по названию..." value="{{ request.GET.q }}">
 
     <select name="status" class="form-select">
@@ -29,11 +28,9 @@
       <tr id="row-{{ product.id }}"
         {% if product.status == "unprofitable" %}
           class="table-danger"
-        {% endif %}
-        {% if product.status == "profitable" %}
+        {% elif product.status == "profitable" %}
           class="table-success"
-        {% endif %}
-        {% if product.status == "doubtful" %}
+        {% elif product.status == "doubtful" %}
           class="table-warning"
         {% endif %}
       >

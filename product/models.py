@@ -9,6 +9,7 @@ class Product(models.Model):
     source_buy=models.URLField(max_length=200)
     created_at=models.DateTimeField(auto_now_add=True)
     stock=models.PositiveIntegerField(default=0)
+    url_website=models.URLField(default="http://example.com")
     @property
     def price(self):
         return self.buy_price

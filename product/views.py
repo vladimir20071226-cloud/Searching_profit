@@ -8,12 +8,21 @@ from django.views import View
 from .models import Product
 from .forms import ProductForm
 from django.http import JsonResponse
+def template(request):
+    return render(request, "example_template.html")
 def main(request):
     return render(request, 'index.html')
 #@verified_required
 def product_list(request):
+    query = request.GET.get('q')
+    status = request.GET.get('status')
     products=Product.objects.all()
-    return render(request, 'product_list.html', {"products": products})
+    if query:
+        products=products.filter(name__icontains=query)
+    if status:
+        products=[p for p in products if p.status==status]
+    context={"request": request, "products": products}
+    return render(request, 'product_list.html', context)
 def login_user(request):
     if request.method=='POST':
         username=request.POST.get("username")
@@ -42,7 +51,6 @@ def product_delete(request, pk):
     if request.method=='POST':
         product=get_object_or_404(Product, pk=pk)
         product.delete()
-        return JsonResponse({"success": True, "id": pk})
     return redirect("product_list")
 def edit_product(request, pk):
     product=get_object_or_404(Product, pk=pk)
@@ -54,23 +62,13 @@ def edit_product(request, pk):
                 "success": True,
                 "id": pk,
                 "name": product.name,
-                "sell_price": product.name,
+                "sell_price": product.sell_price,
                 "buy_price": product.buy_price
             })
         return redirect ("product_list")
     else:
         form=ProductForm(instance=product)
     return render(request, "edit_product.html", {"form": form, "product": product})
-def search_product(request):
-    query=request.GET.get('q')
-    status=request.GET.get('status')
-    products=Product.objects.all()
-    if query:
-        products=products.filter(__icontains=query)
-    if status:
-        products=[p for p in products if p.status==status]
-    context={"request": request, "products": products}
-    return redirect(request, "product_list.html", context)
 def user_logout(request):
     logout(request)
     return redirect("index")
@@ -96,5 +94,6 @@ def sort_status(request):
     products=list(Product.objects.all())
     products.sort(key=lambda p: order.index(p.status))
     return render(request, "product_list.html", {"products": products})
+#778990
 
 
