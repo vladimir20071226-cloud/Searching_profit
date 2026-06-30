@@ -29,5 +29,6 @@ urlpatterns = [
     path('verify-email/', views.verify_email, name="verify_email"),
     path('products/delete/<int:pk>', views.product_delete, name="product_delete"),
     path('products/edit/<int:pk>', views.edit_product, name="edit_product"),
-    path('a/', views.template, name='template')
+    path('a/', views.template, name='template'),
+    path('products/import_csv/', views.import_csv, name="import_csv")
 ]

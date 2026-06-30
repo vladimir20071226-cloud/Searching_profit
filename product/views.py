@@ -6,8 +6,10 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.views import View
 from .models import Product
-from .forms import ProductForm
+from .forms import ProductForm, CSVForm
 from django.http import JsonResponse
+import csv, io
+from .a import get_price
 def template(request):
     return render(request, "example_template.html")
 def main(request):
@@ -83,7 +85,13 @@ def add_product(request):
     if request.method=='POST':
         form=ProductForm(request.POST)
         if form.is_valid():
-            form.save()
+            product = form.save(commit=False)
+            url=form.cleaned_data.get('url_website')
+            if url:
+                price=get_price(url)
+                if price:
+                    product.buy_price=float(price)
+            product.save()
             return redirect("product_list")
     else:
         form=ProductForm()
@@ -96,6 +104,26 @@ def sort_status(request):
     products=list(Product.objects.all())
     products.sort(key=lambda p: order.index(p.status))
     return render(request, "product_list.html", {"products": products})
-#778990
+#775000
+def import_csv(request):
+    if request.method=="POST":
+        form = CSVForm(request.POST, request.FILES)
+        if form.is_valid():
+            file=CSVForm.request.FILES["csv_file"]
+            decoded=file.read().decode("utf-8")
+            reader=csv.DictReader(io.StringIO(decoded))
+            count=0
+            for row in reader:
+                Product.objects.create(name=row.get("name",""),
+                                       buy_price=row.get("buy_price", 0),
+                                       sell_price=row.get("sell_price", 0),
+                                       source_buy=row.get("source_buy", 0),
+                                       source_sell=row.get("source_sell", ""))
+                count+=1
+            return render(request, "csv.html", {"form": CSVForm, "success": count})
+    else:
+        form=CSVForm()
+    return render(request, "csv.html", {"form": form})
+
 
 
