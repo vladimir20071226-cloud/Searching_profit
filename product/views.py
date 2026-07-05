@@ -10,6 +10,8 @@ from .forms import ProductForm, CSVForm
 from django.http import JsonResponse
 import csv, io
 from .a import get_price
+def lending_page(request):
+    return render(request, 'lending_page.html')
 def template(request):
     return render(request, "example_template.html")
 def main(request):
@@ -104,26 +106,69 @@ def sort_status(request):
     products=list(Product.objects.all())
     products.sort(key=lambda p: order.index(p.status))
     return render(request, "product_list.html", {"products": products})
-#775000
 def import_csv(request):
-    if request.method=="POST":
+    if request.method == "POST":
         form = CSVForm(request.POST, request.FILES)
         if form.is_valid():
-            file=CSVForm.request.FILES["csv_file"]
-            decoded=file.read().decode("utf-8")
-            reader=csv.DictReader(io.StringIO(decoded))
-            count=0
-            for row in reader:
-                Product.objects.create(name=row.get("name",""),
-                                       buy_price=row.get("buy_price", 0),
-                                       sell_price=row.get("sell_price", 0),
-                                       source_buy=row.get("source_buy", 0),
-                                       source_sell=row.get("source_sell", ""))
-                count+=1
-            return render(request, "csv.html", {"form": CSVForm, "success": count})
+            try:
+                file = form.cleaned_data["csv_file"]
+                decoded = file.read().decode("utf-8")
+                reader = csv.DictReader(io.StringIO(decoded))
+
+                count = 0
+                errors = []
+
+                for i, row in enumerate(reader, start=2):
+                    name = (row.get("name") or "").strip()
+                    buy_price_raw = (row.get("buy-price") or "").strip()
+                    sell_price_raw = (row.get("sell_price") or "").strip()
+
+                    if not name or not buy_price_raw or not sell_price_raw:
+                        errors.append(f"В строке {i}: пропущены важные поля")
+                        continue
+
+                    try:
+                        buy_price = float(buy_price_raw)
+                        sell_price = float(sell_price_raw)
+                    except ValueError:
+                        errors.append(f"Строка {i}: цена должна быть числом")
+                        continue
+
+                    Product.objects.create(
+                        name=name,
+                        buy_price=buy_price,
+                        sell_price=sell_price,
+                        source_buy=row.get("source_buy", ""),
+                        source_sell=row.get("source_sell", "")
+                    )
+                    count += 1
+
+                return render(
+                    request,
+                    "csv.html",
+                    {
+                        "form": form,
+                        "success": count,
+                        "errors": "; ".join(errors) if errors else None
+                    }
+                )
+
+            except Exception:
+                return render(
+                    request,
+                    "error_pages/error_500.jinja2",
+                    status=500
+                )
+        else:
+            return render(
+                request,
+                "error_pages/error_403.jinja2",
+                status=403
+            )
+
     else:
-        form=CSVForm()
-    return render(request, "csv.html", {"form": form})
+        form = CSVForm()
+        return render(request, "csv.html", {"form": form})
 
 
 

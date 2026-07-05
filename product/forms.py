@@ -10,8 +10,8 @@ class ProductForm(forms.ModelForm):
             "sell_price": "Цена продажи",
             "url_website": "Ссылка на сайт"
         }
-class CSVForm(forms.ModelForm):
-    csv_file=forms.FileField(label="CSV-файл", help_text="формат: name, buy_price,", "sell_price, source_sell, source_buy")
+class CSVForm(forms.Form):
+    csv_file=forms.FileField(label="CSV-файл", help_text="формат: name, buy_price, sell_price, source_sell, source_buy")
 def clean_csv_file(self):
     file=self.cleaned_data["csv_file"]
     if not file.name.endswith(".csv"):

@@ -1,0 +1,32 @@
+*{
+     margin:0;
+    padding:4;
+    box-sizing: border-box;
+}
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystem, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+    sans-serif ;
+    background-color: black;
+    color: #e7e7e7;
+    min-height: 100vh;
+    line-height: 1.5;
+}
+.image-gradient{
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 0.5;
+    z-index: -1;
+}
+.layer-blur{
+    position: absolute;
+    z-index: -1;
+    top: 20%;
+    right: 0;
+    box-shadow: 0 0 700 px 15px white;
+    rotate: -30deg;
+    height: 0;
+    width: 30rem;
+}
+<script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
+<spline-viewer url="https://prod.spline.design/5ORcrAQskghFLH9z/scene.splinecode"></spline-viewer>

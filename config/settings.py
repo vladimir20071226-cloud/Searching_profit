@@ -67,6 +67,18 @@ TEMPLATES = [
             ],
         },
     },
+    {
+        "BACKEND": "django_jinja.backend.Jinja2",
+        "APP_DIRS": True,
+        "DIRS": [BASE_DIR / "templates"],
+        "OPTIONS": {
+            "match_extension": ".jinja2",
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+            ],
+        },
+    },
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
